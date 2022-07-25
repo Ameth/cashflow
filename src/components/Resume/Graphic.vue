@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   lista: {
@@ -45,8 +45,8 @@ const props = defineProps({
 });
 
 const valorToPixels = (valor) => {
-  const min = Math.min(...props.lista);
-  const max = Math.max(...props.lista);
+  const min = Math.min(...props.lista.map((item) => item.valor));
+  const max = Math.max(...props.lista.map((item) => item.valor));
 
   const valorAbsoluto = valor + Math.abs(min);
   const min_max = Math.abs(max) + Math.abs(min);
@@ -62,16 +62,24 @@ const points = computed(() => {
   const total = props.lista.length;
   return props.lista.reduce((points, item, index) => {
     const x = (300 / total) * (index + 1);
-    const y = valorToPixels(item);
+    const y = valorToPixels(item.valor);
     // console.log(y);
     return `${points} ${x},${y}`;
-  }, "0,100");
+  }, `0,${valorToPixels(props.lista.length ? props.lista[0].valor : 0)}`);
 });
 
 const showPointer = ref(false);
 const pointer = ref(0);
 
-const emit = defineEmits(["seleccion"]);
+const emit = defineEmits(["select"]);
+
+watch(pointer, (value) => {
+  const index = Math.ceil(value / (300 / props.lista.length));
+  if (index < 0 || index > props.lista.length) return;
+
+  // console.log("emit", props.lista[index - 1]);
+  emit("select", props.lista[index - 1]);
+});
 
 const tap = ({ target, touches }) => {
   showPointer.value = true;
@@ -80,11 +88,11 @@ const tap = ({ target, touches }) => {
   const elementX = target.getBoundingClientRect().x;
   const touchX = touches[0].clientX;
   pointer.value = ((touchX - elementX) * 300) / elementWidth;
-  // emit("seleccion")
 };
 
 const untap = () => {
   showPointer.value = false;
+  emit("select", { valor: null, date: null });
 };
 </script>
 

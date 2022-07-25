@@ -43,7 +43,7 @@ const valorFormateado = computed(() => {
 });
 
 const labelActual = computed(() => {
-  return props.label !== null ? props.label : props.labelFecha;
+  return props.labelFecha !== null ? props.labelFecha : props.label;
 });
 </script>
 

@@ -6,11 +6,13 @@
     <template #resume>
       <Resume
         :label="'Ahorro total'"
-        label-fecha="23 de julio 2022"
+        :label-fecha="fechaMov"
         :monto="valor"
-        :total-monto="700000"
+        :total-monto="saldoTotal"
       >
-        <template #grafico> <Graphic :lista="movementFilter" /> </template>
+        <template #grafico>
+          <Graphic :lista="movementFilter" @select="select" />
+        </template>
         <template #action> <Action @crear="crear" /> </template>
       </Resume>
     </template>
@@ -27,7 +29,7 @@ import Resume from "@/components/Resume/Index.vue";
 import Graphic from "@/components/Resume/Graphic.vue";
 import Action from "@/components/Action.vue";
 import Movements from "@/components/Movements/Index.vue";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 
 const movementFilter = computed(() => {
   const ultimosDias = movement.value
@@ -37,14 +39,22 @@ const movementFilter = computed(() => {
 
       return item.date > oldDate;
     })
-    .map((item) => item.valor);
+    .map((item) => {
+      return {
+        valor: item.valor,
+        date: item.date,
+      };
+    });
 
   return ultimosDias.map((item, index) => {
-    const ultimosMovimientos = ultimosDias.slice(0, index);
+    const ultimosMovimientos = ultimosDias.slice(0, index + 1);
 
-    return ultimosMovimientos.reduce((suma, valor) => {
-      return suma + valor;
-    }, 0);
+    return {
+      valor: ultimosMovimientos.reduce((suma, item) => {
+        return suma + item.valor;
+      }, 0),
+      date: item.date,
+    };
   });
 
   // return ultimosDias;
@@ -52,88 +62,44 @@ const movementFilter = computed(() => {
   // return movement.map((item) => item.valor);
 });
 
-let valor = null;
-const movement = ref([
-  {
-    id: 1,
-    title: "Compra en HomeCenter",
-    description: "Compra de articulos de aseo",
-    valor: -100000,
-    date: new Date("06/06/2022"),
-  },
-  {
-    id: 2,
-    title: "Compra en Parque Central",
-    description: "Compra de Celular",
-    valor: -450000,
-    date: new Date("06/15/2022"),
-  },
-  {
-    id: 3,
-    title: "Compra en FastFood",
-    description: "Compra de Comida",
-    valor: -60000,
-    date: new Date("06/20/2022"),
-  },
-  {
-    id: 4,
-    title: "Compra en Porthos",
-    description: "Compra de Hamburguesas 🍔",
-    valor: -31000,
-    date: new Date("07/02/2022"),
-  },
-  {
-    id: 5,
-    title: "Consignacion",
-    description: "Transferencia de pago de Nomina",
-    valor: 750000,
-    date: new Date("07/03/2022"),
-  },
-  {
-    id: 6,
-    title: "Compra en Long Hang",
-    description: "Compra de comida china",
-    valor: -19000,
-    date: new Date("07/05/2022"),
-  },
-  {
-    id: 7,
-    title: "Compra en Spotify",
-    description: "Pago mensual del servicio",
-    valor: -24900,
-    date: new Date("07/10/2022"),
-  },
-  {
-    id: 8,
-    title: "Consignacion",
-    description: "Transferencia de Britney Ordoñez",
-    valor: 20000,
-    date: new Date("07/01/2022"),
-  },
-  {
-    id: 9,
-    title: "Compra en Netflix",
-    description: "Pago de servicio mensual",
-    valor: -29900,
-    date: new Date("07/10/2022"),
-  },
-  {
-    id: 10,
-    title: "Consignacion",
-    description: "Transferencia de Victor Cervantes",
-    valor: 50000,
-    date: new Date("07/20/2022"),
-  },
-]);
+const valor = ref(null);
+const fechaMov = ref(null);
+const movement = ref([]);
+
+onMounted(() => {
+  const mov = JSON.parse(localStorage.getItem("movements"));
+  if (Array.isArray(mov)) {
+    movement.value = mov.map((item) => {
+      return { ...item, date: new Date(item.date) };
+    });
+  }
+});
+
+const select = (data) => {
+  valor.value = data.valor;
+  fechaMov.value = data.date ? data.date.toDateString() : null;
+};
 
 const crear = (nuevoMov) => {
   movement.value.push(nuevoMov);
+  guardar();
 };
 
 const eliminarMov = (id) => {
   const index = movement.value.findIndex((item) => item.id === id);
   movement.value.splice(index, 1);
+  guardar();
 };
+
+const guardar = () => {
+  localStorage.setItem("movements", JSON.stringify(movement.value));
+};
+
+const saldoTotal = computed(() => {
+  return movement.value.reduce((suma, item) => {
+    return suma + item.valor;
+  }, 0);
+});
 </script>
 
 <style>

@@ -5,11 +5,23 @@
       <form @submit.prevent="submit">
         <div class="field">
           <label for="titulo">Titulo</label>
-          <input type="text" name="titulo" id="titulo" v-model="title" />
+          <input
+            type="text"
+            name="titulo"
+            id="titulo"
+            v-model="title"
+            autocomplete="off"
+          />
         </div>
         <div class="field">
           <label for="valor">Valor</label>
-          <input type="number" name="valor" id="valor" v-model="valor" />
+          <input
+            type="number"
+            name="valor"
+            id="valor"
+            v-model="valor"
+            autocomplete="off"
+          />
         </div>
         <div class="field">
           <label for="descripcion">Descripción</label>
@@ -72,6 +84,11 @@ const submit = () => {
     date: new Date(),
     id: new Date().getTime(),
   });
+
+  title.value = "";
+  valor.value = 0;
+  description.value = "";
+  movType.value = "Ingreso";
 };
 </script>
 
