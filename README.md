@@ -1,5 +1,7 @@
 # cashflow
 
+Deployed in Netlify: [https://cashflow-ameth.netlify.app/](https://cashflow-ameth.netlify.app/)
+
 ## Project setup
 ```
 npm install
