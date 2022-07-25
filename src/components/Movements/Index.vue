@@ -3,12 +3,13 @@
     <h2 class="title">Historial</h2>
     <div class="content">
       <Movement
-        v-for="{ id, title, description, valor } in movements"
+        v-for="{ id, title, description, valor, date } in movements"
         :key="id"
         :id="id"
         :title="title"
         :description="description"
         :valor="valor"
+        :date="date"
         @remove="eliminar"
       />
     </div>
@@ -27,8 +28,10 @@ const props = defineProps({
 });
 const { movements } = toRefs(props);
 
+const emit = defineEmits("eliminar");
+
 const eliminar = (id) => {
-  console.log("Eliminado", id);
+  emit("eliminar", id);
 };
 </script>
 

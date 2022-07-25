@@ -3,6 +3,7 @@
     <div class="content">
       <h4>{{ title }}</h4>
       <p>{{ description }}</p>
+      <p class="date">{{ date.toLocaleDateString() }}</p>
     </div>
     <div class="action">
       <img
@@ -25,6 +26,7 @@ const props = defineProps({
   title: String,
   description: String,
   valor: Number,
+  date: Date,
 });
 
 const emit = defineEmits(["remove"]);
@@ -65,6 +67,10 @@ h4,
 p {
   margin: 0;
   padding: 0;
+}
+.date {
+  margin-top: 2px;
+  color: rgb(35, 12, 193);
 }
 h4 {
   margin-bottom: 8px;
