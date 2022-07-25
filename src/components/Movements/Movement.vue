@@ -32,7 +32,7 @@ const props = defineProps({
 const emit = defineEmits(["remove"]);
 
 const remove = () => {
-  console.log(props.id);
+  // console.log(props.id);
   emit("remove", props.id);
 };
 
